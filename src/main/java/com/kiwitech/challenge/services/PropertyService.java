@@ -7,4 +7,6 @@ import java.util.List;
 public interface PropertyService {
 
     public List<Property> getProperties();
+
+    public void saveProperties();
 }

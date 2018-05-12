@@ -1,9 +1,25 @@
 package com.kiwitech.challenge.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.kiwitech.challenge.persistence.entities.Property;
 import org.apache.http.HttpHost;
+import org.elasticsearch.action.admin.indices.alias.Alias;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
+import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.support.ActiveShardCount;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -15,17 +31,92 @@ public class DefaultPropertyService implements PropertyService {
 
     @Override
     public List<Property> getProperties() {
-        RestHighLevelClient client = new RestHighLevelClient(
-                RestClient.builder(
-                        new HttpHost("localhost", 9200, "http"),
-                        new HttpHost("localhost", 9201, "http")));
+
+
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void saveProperties() {
+        createDocument();
+        getDocument();
+
+    }
+
+    private void createDocument() {
         try {
+            RestHighLevelClient client = new RestHighLevelClient(
+                    RestClient.builder(
+                            new HttpHost("localhost", 9200, "http")));
 
+            IndexRequest request = new IndexRequest(
+                    "posts",
+                    "doc",
+                    "1");
+            String jsonString = "{" +
+                    "\"user\":\"kimchy\"," +
+                    "\"postDate\":\"2013-01-30\"," +
+                    "\"message\":\"trying out Elasticsearch\"" +
+                    "}";
+            request.source(jsonString, XContentType.JSON);
+            IndexResponse indexResponse = client.index(request);
             client.close();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new ArrayList<>();
+    }
+
+    private void createIndex() {
+        try {
+            RestHighLevelClient client = new RestHighLevelClient(
+                    RestClient.builder(
+                            new HttpHost("localhost", 9200, "http"),
+                            new HttpHost("localhost", 9201, "http")));
+
+            CreateIndexRequest request = new CreateIndexRequest("properties");
+            request.settings(Settings.builder()
+                    .put("index.number_of_shards", 3)
+                    .put("index.number_of_replicas", 2)
+            );
+//            request.mapping("property",
+//                    createIndexJson(0),
+//                    XContentType.JSON);
+            request.alias(new Alias("twitter_alias"));
+            request.timeout(TimeValue.timeValueMinutes(2));
+            request.timeout("2m");
+            request.masterNodeTimeout(TimeValue.timeValueMinutes(1));
+            request.masterNodeTimeout("1m");
+            request.waitForActiveShards(2);
+            request.waitForActiveShards(ActiveShardCount.DEFAULT);
+            CreateIndexResponse createIndexResponse = client.indices().create(request);
+            client.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void getDocument() {
+        try {
+            RestHighLevelClient client = new RestHighLevelClient(
+                    RestClient.builder(
+                            new HttpHost("localhost", 9200, "http"),
+                            new HttpHost("localhost", 9201, "http")));
+
+            GetRequest request = new GetRequest("posts", "doc", "1");
+            GetResponse response = client.get(request);
+            client.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private String createIndexJson(int i) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode property = mapper.createObjectNode();
+        property.put("propertyName", "property" + i);
+        property.put("price", "100" + i);
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(property);
     }
 }

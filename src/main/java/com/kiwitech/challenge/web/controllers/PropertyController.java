@@ -2,9 +2,11 @@ package com.kiwitech.challenge.web.controllers;
 
 import com.kiwitech.challenge.persistence.PropertyRepository;
 import com.kiwitech.challenge.persistence.entities.Property;
+import com.kiwitech.challenge.services.PropertyDataProvider;
 import com.kiwitech.challenge.services.PropertyService;
 import com.kiwitech.challenge.web.dtos.PropertyDto;
 import com.kiwitech.challenge.web.utils.PropertyUtil;
+import org.elasticsearch.action.get.GetResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +27,14 @@ public class PropertyController {
     @Autowired
     PropertyService propertyService;
 
+    @Autowired
+    PropertyDataProvider propertyDataProvider;
+
     @RequestMapping(value = "property",method = RequestMethod.GET)
     public List<PropertyDto> getProperties() {
         List<Property> props = propertyService.getProperties();
+        propertyService.saveProperties();
+
         return PropertyUtil.convert(props);
     }
 
