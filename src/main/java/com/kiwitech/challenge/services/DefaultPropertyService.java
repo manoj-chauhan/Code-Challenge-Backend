@@ -14,12 +14,16 @@ import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.ActiveShardCount;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -40,7 +44,7 @@ public class DefaultPropertyService implements PropertyService {
     public void saveProperties() {
         createDocument();
         getDocument();
-
+        searchDocuments();
     }
 
     private void createDocument() {
@@ -111,6 +115,23 @@ public class DefaultPropertyService implements PropertyService {
         }
     }
 
+    private void searchDocuments() {
+        try {
+            RestHighLevelClient client = new RestHighLevelClient(
+                    RestClient.builder(
+                            new HttpHost("localhost", 9200, "http"),
+                            new HttpHost("localhost", 9201, "http")));
+
+            SearchRequest searchRequest = new SearchRequest("posts");
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+            searchRequest.source(searchSourceBuilder);
+            SearchResponse response = client.search(searchRequest);
+            client.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private String createIndexJson(int i) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
