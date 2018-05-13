@@ -4,9 +4,7 @@ import com.kiwitech.challenge.persistence.entities.Property;
 
 import java.util.List;
 
-public interface PropertyService {
+public interface PropertySearchService {
 
-    public List<Property> getProperties();
-
-    public void saveProperties();
+    public List<Property> getFeaturedProperties();
 }

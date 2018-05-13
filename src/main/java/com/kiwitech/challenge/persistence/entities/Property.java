@@ -10,9 +10,17 @@ public class Property {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String propertyName;
-    private String propertyLocation;
+    private String description;
+    private double locationLattitude;
+    private double getLocationLattitude;
+    private String city;
+    private int beds;
+    private int baths;
+    private int kitchens;
+    private boolean petsAllowed;
     private String propertyType;
-    private String price;
+    private String minPrice;
+    private String maxPrice;
 
     public Long getId() {
         return id;
@@ -30,12 +38,68 @@ public class Property {
         this.propertyName = propertyName;
     }
 
-    public String getPropertyLocation() {
-        return propertyLocation;
+    public String getDescription() {
+        return description;
     }
 
-    public void setPropertyLocation(String propertyLocation) {
-        this.propertyLocation = propertyLocation;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public double getLocationLattitude() {
+        return locationLattitude;
+    }
+
+    public void setLocationLattitude(double locationLattitude) {
+        this.locationLattitude = locationLattitude;
+    }
+
+    public double getGetLocationLattitude() {
+        return getLocationLattitude;
+    }
+
+    public void setGetLocationLattitude(double getLocationLattitude) {
+        this.getLocationLattitude = getLocationLattitude;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public int getBeds() {
+        return beds;
+    }
+
+    public void setBeds(int beds) {
+        this.beds = beds;
+    }
+
+    public int getBaths() {
+        return baths;
+    }
+
+    public void setBaths(int baths) {
+        this.baths = baths;
+    }
+
+    public int getKitchens() {
+        return kitchens;
+    }
+
+    public void setKitchens(int kitchens) {
+        this.kitchens = kitchens;
+    }
+
+    public boolean isPetsAllowed() {
+        return petsAllowed;
+    }
+
+    public void setPetsAllowed(boolean petsAllowed) {
+        this.petsAllowed = petsAllowed;
     }
 
     public String getPropertyType() {
@@ -46,11 +110,19 @@ public class Property {
         this.propertyType = propertyType;
     }
 
-    public String getPrice() {
-        return price;
+    public String getMinPrice() {
+        return minPrice;
     }
 
-    public void setPrice(String price) {
-        this.price = price;
+    public void setMinPrice(String minPrice) {
+        this.minPrice = minPrice;
+    }
+
+    public String getMaxPrice() {
+        return maxPrice;
+    }
+
+    public void setMaxPrice(String maxPrice) {
+        this.maxPrice = maxPrice;
     }
 }

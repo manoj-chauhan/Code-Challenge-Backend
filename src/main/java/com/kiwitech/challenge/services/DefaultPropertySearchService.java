@@ -2,9 +2,7 @@ package com.kiwitech.challenge.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.kiwitech.challenge.persistence.entities.Property;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.alias.Alias;
@@ -24,6 +22,8 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -31,21 +31,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class DefaultPropertyService implements PropertyService {
+public class DefaultPropertySearchService implements PropertySearchService {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public List<Property> getProperties() {
-
-
-        return new ArrayList<>();
-    }
-
-    @Override
-    public void saveProperties() {
-        createDocument();
+    public List<Property> getFeaturedProperties() {
         getDocument();
-        searchDocuments();
+        return null;
     }
+
 
     private void createDocument() {
         try {
@@ -109,6 +104,8 @@ public class DefaultPropertyService implements PropertyService {
 
             GetRequest request = new GetRequest("posts", "doc", "1");
             GetResponse response = client.get(request);
+            String data = response.getSourceAsString();
+            LOGGER.info("Source Data: " + data);
             client.close();
         } catch (IOException e) {
             e.printStackTrace();

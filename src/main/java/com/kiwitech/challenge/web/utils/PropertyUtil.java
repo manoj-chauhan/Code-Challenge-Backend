@@ -13,8 +13,6 @@ public class PropertyUtil {
             PropertyDto dto = new PropertyDto();
             dto.setId(p.getId());
             dto.setPropertyName(p.getPropertyName());
-            dto.setPrice(p.getPrice());
-            dto.setPropertyLocation(p.getPropertyLocation());
             dto.setPropertyType(p.getPropertyType());
             propertyDtoList.add(dto);
         }
