@@ -4,16 +4,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kiwitech.challenge.persistence.entities.Property;
+import org.apache.http.Header;
 import org.apache.http.HttpHost;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicHeader;
 import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.get.*;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.ActiveShardCount;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -21,6 +24,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +41,7 @@ public class DefaultPropertySearchService implements PropertySearchService {
 
     @Override
     public List<Property> getFeaturedProperties() {
-        getDocument();
+        searchDocuments();
         return null;
     }
 
@@ -111,6 +115,56 @@ public class DefaultPropertySearchService implements PropertySearchService {
             e.printStackTrace();
         }
     }
+    private void getMultipleDocument() {
+        try {
+            RestHighLevelClient client = new RestHighLevelClient(
+                    RestClient.builder(
+                            new HttpHost("localhost", 9200, "http"),
+                            new HttpHost("localhost", 9201, "http")));
+
+            MultiGetRequest multiGetRequest = new MultiGetRequest();
+
+            Header header = new BasicHeader("","");
+            MultiGetResponse multiGetItemResponses = client.multiGet(multiGetRequest, header);
+
+            for (MultiGetItemResponse itemResponse : multiGetItemResponses) {
+                GetResponse response = itemResponse.getResponse();
+                if (response.isExists()) {
+                    String json = response.getSourceAsString();
+                LOGGER.info("Source Data: " + json);
+                }
+            }
+            client.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getMultipleDocuments() {
+        try {
+            RestHighLevelClient client = new RestHighLevelClient(
+                    RestClient.builder(
+                            new HttpHost("localhost", 9200, "http"),
+                            new HttpHost("localhost", 9201, "http")));
+
+            MultiGetRequest multiGetRequest = new MultiGetRequest();
+
+            Header header = new BasicHeader("","");
+            MultiGetResponse multiGetItemResponses = client.multiGet(multiGetRequest, header);
+
+            for (MultiGetItemResponse itemResponse : multiGetItemResponses) {
+                GetResponse response = itemResponse.getResponse();
+                if (response.isExists()) {
+                    String json = response.getSourceAsString();
+                    LOGGER.info("Source Data: " + json);
+                }
+            }
+            client.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     private void searchDocuments() {
         try {
@@ -124,6 +178,11 @@ public class DefaultPropertySearchService implements PropertySearchService {
             searchSourceBuilder.query(QueryBuilders.matchAllQuery());
             searchRequest.source(searchSourceBuilder);
             SearchResponse response = client.search(searchRequest);
+            SearchHit[] hits = response.getHits().getHits();
+            for (SearchHit h: hits) {
+                String json = h.getSourceAsString();
+                LOGGER.info("Source Data: " + json);
+            }
             client.close();
         } catch (IOException e) {
             e.printStackTrace();
