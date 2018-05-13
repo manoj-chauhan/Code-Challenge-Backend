@@ -2,6 +2,7 @@ package com.kiwitech.challenge.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kiwitech.challenge.persistence.entities.Property;
 import org.apache.http.Header;
@@ -41,27 +42,43 @@ public class DefaultPropertySearchService implements PropertySearchService {
 
     @Override
     public List<Property> getFeaturedProperties() {
+        for (int i = 0; i < 100; i++) {
+
+            Property p = new Property();
+            p.setCity("New York");
+            p.setLocationLattitude(938493285);
+            p.setMinPrice("7");
+            p.setMaxPrice("17");
+            p.setBaths(2);
+            p.setBeds(2);
+            p.setLocationLattitude(3478975);
+            p.setDescription("Near River bank");
+            p.setKitchens(1);
+            p.setPropertyName("Pent House");
+            p.setPropertyType("Rented");
+
+            createDocument(p);
+        }
         searchDocuments();
         return null;
     }
 
 
-    private void createDocument() {
+    private void createDocument(Property propety) {
         try {
             RestHighLevelClient client = new RestHighLevelClient(
                     RestClient.builder(
                             new HttpHost("localhost", 9200, "http")));
 
             IndexRequest request = new IndexRequest(
-                    "posts",
-                    "doc",
-                    "1");
-            String jsonString = "{" +
-                    "\"user\":\"kimchy\"," +
-                    "\"postDate\":\"2013-01-30\"," +
-                    "\"message\":\"trying out Elasticsearch\"" +
-                    "}";
-            request.source(jsonString, XContentType.JSON);
+                    "properties",
+                    "doc");
+
+            request.source(propety, XContentType.JSON);
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(propety);
+            request.source(json, XContentType.JSON);
+
             IndexResponse indexResponse = client.index(request);
             client.close();
         } catch (IOException e) {
@@ -106,7 +123,7 @@ public class DefaultPropertySearchService implements PropertySearchService {
                             new HttpHost("localhost", 9200, "http"),
                             new HttpHost("localhost", 9201, "http")));
 
-            GetRequest request = new GetRequest("posts", "doc", "1");
+            GetRequest request = new GetRequest("properties", "doc", "1");
             GetResponse response = client.get(request);
             String data = response.getSourceAsString();
             LOGGER.info("Source Data: " + data);
@@ -173,7 +190,7 @@ public class DefaultPropertySearchService implements PropertySearchService {
                             new HttpHost("localhost", 9200, "http"),
                             new HttpHost("localhost", 9201, "http")));
 
-            SearchRequest searchRequest = new SearchRequest("posts");
+            SearchRequest searchRequest = new SearchRequest("properties");
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
             searchSourceBuilder.query(QueryBuilders.matchAllQuery());
             searchRequest.source(searchSourceBuilder);
