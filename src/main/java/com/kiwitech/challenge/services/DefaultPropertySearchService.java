@@ -2,12 +2,10 @@ package com.kiwitech.challenge.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kiwitech.challenge.persistence.entities.Property;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
-import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicHeader;
 import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -17,7 +15,6 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.ActiveShardCount;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -42,25 +39,23 @@ public class DefaultPropertySearchService implements PropertySearchService {
 
     @Override
     public List<Property> getFeaturedProperties() {
-        for (int i = 0; i < 100; i++) {
-
-            Property p = new Property();
-            p.setCity("New York");
-            p.setLocationLattitude(938493285);
-            p.setMinPrice("7");
-            p.setMaxPrice("17");
-            p.setBaths(2);
-            p.setBeds(2);
-            p.setLocationLattitude(3478975);
-            p.setDescription("Near River bank");
-            p.setKitchens(1);
-            p.setPropertyName("Pent House");
-            p.setPropertyType("Rented");
-
-            createDocument(p);
-        }
-        searchDocuments();
-        return null;
+//        for (int i = 0; i < 10; i++) {
+//            Property p = new Property();
+//            p.setCity("New York");
+//            p.setLocationLattitude(938493285);
+//            p.setMinPrice("7");
+//            p.setMaxPrice("17");
+//            p.setBaths(2);
+//            p.setBeds(10);
+//            p.setLocationLattitude(3478975);
+//            p.setDescription("Near River bank");
+//            p.setKitchens(1);
+//            p.setPropertyName("Studio");
+//            p.setPropertyType("Owned");
+//
+//            createDocument(p);
+//        }
+        return searchDocuments();
     }
 
 
@@ -183,8 +178,9 @@ public class DefaultPropertySearchService implements PropertySearchService {
 
     }
 
-    private void searchDocuments() {
+    private List<Property> searchDocuments() {
         try {
+            List<Property> properties = new ArrayList<>();
             RestHighLevelClient client = new RestHighLevelClient(
                     RestClient.builder(
                             new HttpHost("localhost", 9200, "http"),
@@ -198,12 +194,16 @@ public class DefaultPropertySearchService implements PropertySearchService {
             SearchHit[] hits = response.getHits().getHits();
             for (SearchHit h: hits) {
                 String json = h.getSourceAsString();
-                LOGGER.info("Source Data: " + json);
+                ObjectMapper mapper = new ObjectMapper();
+                Property p = mapper.readValue(json, Property.class);
+                properties.add(p);
             }
             client.close();
+            return properties;
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     private String createIndexJson(int i) throws JsonProcessingException {

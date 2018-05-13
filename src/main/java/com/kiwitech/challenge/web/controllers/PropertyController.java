@@ -29,10 +29,8 @@ public class PropertyController {
 
     @RequestMapping(value = "property",method = RequestMethod.GET)
     public List<PropertyDto> getProperties() {
-        List<Property> props = new ArrayList<>();
-        propertyService.getFeaturedProperties();
-
-        return PropertyUtil.convert(props);
+        List<Property> properties = propertyService.getFeaturedProperties();
+        return PropertyUtil.convert(properties);
     }
 
 
