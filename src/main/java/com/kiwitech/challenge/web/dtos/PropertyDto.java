@@ -19,6 +19,7 @@ public class PropertyDto {
     private String propertyType;
     private String minPrice;
     private String maxPrice;
+    private String image;
 
     public Long getId() {
         return id;
@@ -122,5 +123,13 @@ public class PropertyDto {
 
     public void setMaxPrice(String maxPrice) {
         this.maxPrice = maxPrice;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }
