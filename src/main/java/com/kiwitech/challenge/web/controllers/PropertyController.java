@@ -1,10 +1,13 @@
 package com.kiwitech.challenge.web.controllers;
 
+import com.kiwitech.challenge.persistence.CityRepository;
+import com.kiwitech.challenge.persistence.entities.City;
 import com.kiwitech.challenge.persistence.entities.Property;
 import com.kiwitech.challenge.services.PropertyDataProvider;
 import com.kiwitech.challenge.services.PropertySearchService;
 import com.kiwitech.challenge.web.dtos.PropertyDto;
 import com.kiwitech.challenge.web.utils.PropertyUtil;
+import org.hibernate.validator.constraints.Length;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,9 @@ public class PropertyController {
     @Autowired
     PropertyDataProvider propertyDataProvider;
 
+    @Autowired
+    CityRepository cityRepository;
+
     @RequestMapping(value = "property",method = RequestMethod.GET)
     public List<PropertyDto> getProperties() {
         List<Property> properties = propertyService.getFeaturedProperties();
@@ -48,6 +54,11 @@ public class PropertyController {
                 .contentLength(io.available())
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(new InputStreamResource(io));
+    }
+
+    @RequestMapping(value = "city/suggestions",method = RequestMethod.GET)
+    public List<City> getSuggestedCities(@RequestParam("initials") @Length(min = 3)String initials) {
+        return cityRepository.findCitiesStartingWith(initials);
     }
 
 
