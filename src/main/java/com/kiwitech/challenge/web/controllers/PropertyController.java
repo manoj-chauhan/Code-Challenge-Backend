@@ -1,5 +1,6 @@
 package com.kiwitech.challenge.web.controllers;
 
+import com.kiwitech.challenge.DataPopulator;
 import com.kiwitech.challenge.persistence.CityRepository;
 import com.kiwitech.challenge.persistence.entities.City;
 import com.kiwitech.challenge.persistence.entities.Property;
@@ -41,6 +42,9 @@ public class PropertyController {
     @Autowired
     PropertyUtil propertyUtil;
 
+    @Autowired
+    DataPopulator populator;
+
     @RequestMapping(value = "property",method = RequestMethod.GET)
     public List<PropertyDto> getProperties() {
         return propertyService.getFeaturedProperties();
@@ -61,6 +65,18 @@ public class PropertyController {
     @RequestMapping(value = "city/suggestions",method = RequestMethod.GET)
     public List<City> getSuggestedCities(@RequestParam("initials") @Length(min = 3)String initials) {
         return cityRepository.findCitiesStartingWith(initials);
+    }
+
+    @RequestMapping(value = "populate",method = RequestMethod.GET)
+    public String populateData() {
+        populator.populateData();
+        return "Successfully Done";
+    }
+
+    @RequestMapping(value = "createIndex",method = RequestMethod.GET)
+    public String populateIndex() {
+        populator.createIndex();
+        return "Successfully Done";
     }
 
 

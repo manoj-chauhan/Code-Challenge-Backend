@@ -146,7 +146,7 @@ public class DataPopulator {
         }
     }
 
-    private void createIndex() {
+    public void createIndex() {
         try {
             RestHighLevelClient client = new RestHighLevelClient(
                     RestClient.builder(
@@ -160,57 +160,54 @@ public class DataPopulator {
                     .put("index.number_of_shards", 3)
                     .put("index.number_of_replicas", 2)
             );
-            request.mapping("test_index",
-                    "{" +
-                            "    \"prop\": {" +
-                            "      \"properties\": {" +
-                            "        \"id\": {" +
-                            "            \"type\": \"long\"" +
-                            "        }," +
-                            "        \"propertyName\": {" +
-                            "          \"type\": \"text\"" +
-                            "        }," +
-                            "        \"description\": {" +
-                            "          \"type\": \"text\"" +
-                            "        }," +
-                            "        \"location\": {" +
-                            "          \"type\": \"geo_point\"" +
-                            "        }," +
-                            "        \"city\": {" +
-                            "          \"type\": \"text\"" +
-                            "        }," +
-                            "        \"beds\": {" +
-                            "          \"type\": \"integer\"" +
-                            "        }," +
-                            "        \"baths\": {" +
-                            "          \"type\": \"integer\"" +
-                            "        }," +
-                            "        \"kitchens\": {" +
-                            "          \"type\": \"integer\"" +
-                            "        }," +
-                            "        \"petsAllowed\": {" +
-                            "          \"type\": \"boolean\"" +
-                            "        }," +
-                            "        \"propertyType\": {" +
-                            "          \"type\": \"text\"" +
-                            "        }," +
-                            "        \"minPrice\": {" +
-                            "          \"type\": \"integer\"" +
-                            "        }," +
-                            "        \"maxPrice\": {" +
-                            "          \"type\": \"integer\"" +
-                            "        }," +
-                            "        \"image\": {" +
-                            "          \"type\": \"text\"" +
-                            "        }" +
-                            "      }" +
-                            "    }" +
+            request.mapping("prop",
+                    "{\n" +
+                            "    \"prop\": {\n" +
+                            "      \"properties\": {\n" +
+                            "        \"id\": {\n" +
+                            "            \"type\": \"long\"\n" +
+                            "        },\n" +
+                            "        \"propertyName\": {\n" +
+                            "          \"type\": \"text\"\n" +
+                            "        },\n" +
+                            "        \"description\": {\n" +
+                            "          \"type\": \"text\"\n" +
+                            "        },\n" +
+                            "        \"location\": {\n" +
+                            "          \"type\": \"geo_point\"\n" +
+                            "        },\n" +
+                            "        \"city\": {\n" +
+                            "          \"type\": \"text\"\n" +
+                            "        },\n" +
+                            "        \"beds\": {\n" +
+                            "          \"type\": \"integer\"\n" +
+                            "        },\n" +
+                            "        \"baths\": {\n" +
+                            "          \"type\": \"integer\"\n" +
+                            "        },\n" +
+                            "        \"kitchens\": {\n" +
+                            "          \"type\": \"integer\"\n" +
+                            "        },\n" +
+                            "        \"petsAllowed\": {\n" +
+                            "          \"type\": \"boolean\"\n" +
+                            "        },\n" +
+                            "        \"propertyType\": {\n" +
+                            "          \"type\": \"text\"\n" +
+                            "        },\n" +
+                            "        \"minPrice\": {\n" +
+                            "          \"type\": \"integer\"\n" +
+                            "        },\n" +
+                            "        \"maxPrice\": {\n" +
+                            "          \"type\": \"integer\"\n" +
+                            "        },\n" +
+                            "        \"image\": {\n" +
+                            "          \"type\": \"text\"\n" +
+                            "        }\n" +
+                            "      }\n" +
+                            "    }\n" +
                             "  }",
                     XContentType.JSON);
-            request.alias(
-                    new Alias("test_index_alias")
-            );
-            request.alias(new Alias("twitter_alias"));
+            request.alias(new Alias("properties_alias"));
             request.timeout(TimeValue.timeValueMinutes(2));
             request.timeout("2m");
             request.masterNodeTimeout(TimeValue.timeValueMinutes(1));
