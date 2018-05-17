@@ -26,6 +26,8 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -36,6 +38,12 @@ import java.util.List;
 public class DefaultPropertySearchService implements PropertySearchService {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    Environment env;
+
+//    public static String ELASTICSEARCH_URL = "vpc-challenge-dvrvpwazki45l2vbrpfwydejvy.us-west-2.es.amazonaws.com";
+
 
     @Override
     public List<Property> getFeaturedProperties() {
@@ -63,7 +71,10 @@ public class DefaultPropertySearchService implements PropertySearchService {
         try {
             RestHighLevelClient client = new RestHighLevelClient(
                     RestClient.builder(
-                            new HttpHost("localhost", 9200, "http")));
+                            new HttpHost(
+                                    env.getProperty("challenge.elastic.domain"),
+                                    Integer.parseInt(env.getProperty("challenge.elastic.port")),
+                                    env.getProperty("challenge.elastic.scheme"))));
 
             IndexRequest request = new IndexRequest(
                     "properties",
@@ -85,8 +96,10 @@ public class DefaultPropertySearchService implements PropertySearchService {
         try {
             RestHighLevelClient client = new RestHighLevelClient(
                     RestClient.builder(
-                            new HttpHost("localhost", 9200, "http"),
-                            new HttpHost("localhost", 9201, "http")));
+                            new HttpHost(
+                                    env.getProperty("challenge.elastic.domain"),
+                                    Integer.parseInt(env.getProperty("challenge.elastic.port")),
+                                    env.getProperty("challenge.elastic.scheme"))));
 
             CreateIndexRequest request = new CreateIndexRequest("properties");
             request.settings(Settings.builder()
@@ -115,8 +128,10 @@ public class DefaultPropertySearchService implements PropertySearchService {
         try {
             RestHighLevelClient client = new RestHighLevelClient(
                     RestClient.builder(
-                            new HttpHost("localhost", 9200, "http"),
-                            new HttpHost("localhost", 9201, "http")));
+                            new HttpHost(
+                                    env.getProperty("challenge.elastic.domain"),
+                                    Integer.parseInt(env.getProperty("challenge.elastic.port")),
+                                    env.getProperty("challenge.elastic.scheme"))));
 
             GetRequest request = new GetRequest("properties", "doc", "1");
             GetResponse response = client.get(request);
@@ -131,8 +146,10 @@ public class DefaultPropertySearchService implements PropertySearchService {
         try {
             RestHighLevelClient client = new RestHighLevelClient(
                     RestClient.builder(
-                            new HttpHost("localhost", 9200, "http"),
-                            new HttpHost("localhost", 9201, "http")));
+                            new HttpHost(
+                                    env.getProperty("challenge.elastic.domain"),
+                                    Integer.parseInt(env.getProperty("challenge.elastic.port")),
+                                    env.getProperty("challenge.elastic.scheme"))));
 
             MultiGetRequest multiGetRequest = new MultiGetRequest();
 
@@ -156,8 +173,10 @@ public class DefaultPropertySearchService implements PropertySearchService {
         try {
             RestHighLevelClient client = new RestHighLevelClient(
                     RestClient.builder(
-                            new HttpHost("localhost", 9200, "http"),
-                            new HttpHost("localhost", 9201, "http")));
+                            new HttpHost(
+                                    env.getProperty("challenge.elastic.domain"),
+                                    Integer.parseInt(env.getProperty("challenge.elastic.port")),
+                                    env.getProperty("challenge.elastic.scheme"))));
 
             MultiGetRequest multiGetRequest = new MultiGetRequest();
 
@@ -183,8 +202,10 @@ public class DefaultPropertySearchService implements PropertySearchService {
             List<Property> properties = new ArrayList<>();
             RestHighLevelClient client = new RestHighLevelClient(
                     RestClient.builder(
-                            new HttpHost("localhost", 9200, "http"),
-                            new HttpHost("localhost", 9201, "http")));
+                            new HttpHost(
+                                    env.getProperty("challenge.elastic.domain"),
+                                    Integer.parseInt(env.getProperty("challenge.elastic.port")),
+                                    env.getProperty("challenge.elastic.scheme"))));
 
             SearchRequest searchRequest = new SearchRequest("properties");
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();

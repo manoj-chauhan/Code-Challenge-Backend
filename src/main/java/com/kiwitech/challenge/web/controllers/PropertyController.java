@@ -38,10 +38,13 @@ public class PropertyController {
     @Autowired
     CityRepository cityRepository;
 
+    @Autowired
+    PropertyUtil propertyUtil;
+
     @RequestMapping(value = "property",method = RequestMethod.GET)
     public List<PropertyDto> getProperties() {
         List<Property> properties = propertyService.getFeaturedProperties();
-        return PropertyUtil.convert(properties);
+        return propertyUtil.convert(properties);
     }
 
     @RequestMapping(value = "property/image/{imageId}", method = RequestMethod.GET)
