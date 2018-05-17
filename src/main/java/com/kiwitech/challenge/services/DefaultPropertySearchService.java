@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kiwitech.challenge.persistence.entities.Property;
+import com.kiwitech.challenge.web.dtos.PropertyDto;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.message.BasicHeader;
@@ -46,82 +47,12 @@ public class DefaultPropertySearchService implements PropertySearchService {
 
 
     @Override
-    public List<Property> getFeaturedProperties() {
-//        for (int i = 0; i < 10; i++) {
-//            Property p = new Property();
-//            p.setCity("New York");
-//            p.setLocationLattitude(938493285);
-//            p.setMinPrice("7");
-//            p.setMaxPrice("17");
-//            p.setBaths(2);
-//            p.setBeds(10);
-//            p.setLocationLattitude(3478975);
-//            p.setDescription("Near River bank");
-//            p.setKitchens(1);
-//            p.setPropertyName("Studio");
-//            p.setPropertyType("Owned");
-//
-//            createDocument(p);
-//        }
+    public List<PropertyDto> getFeaturedProperties() {
         return searchDocuments();
     }
 
 
-    private void createDocument(Property propety) {
-        try {
-            RestHighLevelClient client = new RestHighLevelClient(
-                    RestClient.builder(
-                            new HttpHost(
-                                    env.getProperty("challenge.elastic.domain"),
-                                    Integer.parseInt(env.getProperty("challenge.elastic.port")),
-                                    env.getProperty("challenge.elastic.scheme"))));
 
-            IndexRequest request = new IndexRequest(
-                    "properties",
-                    "doc");
-
-            request.source(propety, XContentType.JSON);
-            ObjectMapper mapper = new ObjectMapper();
-            String json = mapper.writeValueAsString(propety);
-            request.source(json, XContentType.JSON);
-
-            IndexResponse indexResponse = client.index(request);
-            client.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void createIndex() {
-        try {
-            RestHighLevelClient client = new RestHighLevelClient(
-                    RestClient.builder(
-                            new HttpHost(
-                                    env.getProperty("challenge.elastic.domain"),
-                                    Integer.parseInt(env.getProperty("challenge.elastic.port")),
-                                    env.getProperty("challenge.elastic.scheme"))));
-
-            CreateIndexRequest request = new CreateIndexRequest("properties");
-            request.settings(Settings.builder()
-                    .put("index.number_of_shards", 3)
-                    .put("index.number_of_replicas", 2)
-            );
-//            request.mapping("property",
-//                    createIndexJson(0),
-//                    XContentType.JSON);
-            request.alias(new Alias("twitter_alias"));
-            request.timeout(TimeValue.timeValueMinutes(2));
-            request.timeout("2m");
-            request.masterNodeTimeout(TimeValue.timeValueMinutes(1));
-            request.masterNodeTimeout("1m");
-            request.waitForActiveShards(2);
-            request.waitForActiveShards(ActiveShardCount.DEFAULT);
-            CreateIndexResponse createIndexResponse = client.indices().create(request);
-            client.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 
     private void getDocument() {
@@ -197,9 +128,9 @@ public class DefaultPropertySearchService implements PropertySearchService {
 
     }
 
-    private List<Property> searchDocuments() {
+    private List<PropertyDto> searchDocuments() {
         try {
-            List<Property> properties = new ArrayList<>();
+            List<PropertyDto> properties = new ArrayList<>();
             RestHighLevelClient client = new RestHighLevelClient(
                     RestClient.builder(
                             new HttpHost(
@@ -216,7 +147,7 @@ public class DefaultPropertySearchService implements PropertySearchService {
             for (SearchHit h: hits) {
                 String json = h.getSourceAsString();
                 ObjectMapper mapper = new ObjectMapper();
-                Property p = mapper.readValue(json, Property.class);
+                PropertyDto p = mapper.readValue(json, PropertyDto.class);
                 properties.add(p);
             }
             client.close();

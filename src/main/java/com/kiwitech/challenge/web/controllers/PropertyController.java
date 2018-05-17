@@ -43,8 +43,7 @@ public class PropertyController {
 
     @RequestMapping(value = "property",method = RequestMethod.GET)
     public List<PropertyDto> getProperties() {
-        List<Property> properties = propertyService.getFeaturedProperties();
-        return propertyUtil.convert(properties);
+        return propertyService.getFeaturedProperties();
     }
 
     @RequestMapping(value = "property/image/{imageId}", method = RequestMethod.GET)

@@ -12,11 +12,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class ChallengeApplicationTests {
 
 	@Autowired
-	PropertySearchService propertySearchService;
+	DataPopulator dataPopulator;
 
 	@Test
 	public void contextLoads() {
-		propertySearchService.getFeaturedProperties();
+		dataPopulator.populateData();
 	}
 
 }

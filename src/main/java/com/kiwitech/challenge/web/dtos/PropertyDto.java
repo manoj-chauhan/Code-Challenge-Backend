@@ -6,19 +6,61 @@ import javax.persistence.Id;
 
 public class PropertyDto {
 
+    /*
+    {
+  "id": 35333454,
+  "propertyName": "Villa",
+  "description": "Beautiful Place",
+  "location": {
+    "lat": 27.54545,
+    "lon": 28.344
+  },
+  "city": "Chandigarh",
+  "beds": 2,
+  "baths": 3,
+  "kitchens": 1,
+  "petsAllowed": true,
+  "propertyType": "Rented",
+  "minPrice": 200,
+  "maxPrice": 1000,
+  "image": "http://dummy.url.com"
+}
+
+     */
+
+    public static class Location {
+        private double lat;
+        private double lon;
+
+        public double getLat() {
+            return lat;
+        }
+
+        public void setLat(double lat) {
+            this.lat = lat;
+        }
+
+        public double getLon() {
+            return lon;
+        }
+
+        public void setLon(double lon) {
+            this.lon = lon;
+        }
+    }
+
     private Long id;
     private String propertyName;
     private String description;
-    private double locationLattitude;
-    private double getLocationLattitude;
+    private Location location;
     private String city;
     private int beds;
     private int baths;
     private int kitchens;
     private boolean petsAllowed;
     private String propertyType;
-    private String minPrice;
-    private String maxPrice;
+    private int minPrice;
+    private int maxPrice;
     private String image;
 
     public Long getId() {
@@ -43,22 +85,6 @@ public class PropertyDto {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public double getLocationLattitude() {
-        return locationLattitude;
-    }
-
-    public void setLocationLattitude(double locationLattitude) {
-        this.locationLattitude = locationLattitude;
-    }
-
-    public double getGetLocationLattitude() {
-        return getLocationLattitude;
-    }
-
-    public void setGetLocationLattitude(double getLocationLattitude) {
-        this.getLocationLattitude = getLocationLattitude;
     }
 
     public String getCity() {
@@ -109,27 +135,35 @@ public class PropertyDto {
         this.propertyType = propertyType;
     }
 
-    public String getMinPrice() {
-        return minPrice;
-    }
-
-    public void setMinPrice(String minPrice) {
-        this.minPrice = minPrice;
-    }
-
-    public String getMaxPrice() {
-        return maxPrice;
-    }
-
-    public void setMaxPrice(String maxPrice) {
-        this.maxPrice = maxPrice;
-    }
-
     public String getImage() {
         return image;
     }
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public int getMinPrice() {
+        return minPrice;
+    }
+
+    public void setMinPrice(int minPrice) {
+        this.minPrice = minPrice;
+    }
+
+    public int getMaxPrice() {
+        return maxPrice;
+    }
+
+    public void setMaxPrice(int maxPrice) {
+        this.maxPrice = maxPrice;
     }
 }
