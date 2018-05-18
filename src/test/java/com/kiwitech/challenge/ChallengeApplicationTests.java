@@ -19,4 +19,8 @@ public class ChallengeApplicationTests {
 		dataPopulator.populateData();
 	}
 
+	@Test
+	public void SearchByLocationTest() {
+		dataPopulator.searchProperty( 28.465092,77.034414,1);
+	}
 }

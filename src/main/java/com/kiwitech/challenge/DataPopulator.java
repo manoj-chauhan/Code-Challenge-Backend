@@ -1,7 +1,6 @@
 package com.kiwitech.challenge;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kiwitech.challenge.persistence.entities.Property;
 import com.kiwitech.challenge.web.dtos.PropertyDto;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.alias.Alias;
@@ -9,12 +8,20 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.ActiveShardCount;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.GeoDistanceQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +30,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -140,6 +147,49 @@ public class DataPopulator {
             request.source(json, XContentType.JSON);
             IndexResponse indexResponse = client.index(request);
             LOGGER.info("Document Indexed: " + indexResponse.toString());
+            client.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void searchProperty(double latitude, double longitude, int distance) {
+        try {
+            RestHighLevelClient client = new RestHighLevelClient(
+                    RestClient.builder(
+                            new HttpHost(
+                                    env.getProperty("challenge.elastic.domain"),
+                                    Integer.parseInt(env.getProperty("challenge.elastic.port")),
+                                    env.getProperty("challenge.elastic.scheme"))));
+
+            GeoDistanceQueryBuilder queryBuilder = QueryBuilders.geoDistanceQuery("location")
+                    .point(latitude, longitude)
+                    .distance(10, DistanceUnit.KILOMETERS);
+
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            searchSourceBuilder.query(queryBuilder);
+
+            SearchRequest searchRequest = new SearchRequest("properties");
+            searchRequest.types("prop");
+            searchRequest.source(searchSourceBuilder);
+
+            SearchResponse response = client.search(searchRequest);
+            SearchHits data = response.getHits();
+
+
+            List<PropertyDto> properties = new ArrayList<>();
+            for (SearchHit d: data.getHits()) {
+                    String json = d.getSourceAsString();
+                    ObjectMapper mapper = new ObjectMapper();
+                    PropertyDto p = mapper.readValue(json, PropertyDto.class);
+                    properties.add(p);
+            }
+
+            for (PropertyDto p: properties) {
+                LOGGER.info("Source Data: " + p.getCity());
+            }
+
             client.close();
         } catch (IOException e) {
             e.printStackTrace();
